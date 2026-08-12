@@ -1,0 +1,437 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Deck</title>
+
+<style>
+:root{
+  --paper:#E9E7E2;
+  --paper-deep:#DFDCD5;
+  --ink:#16181B;
+  --graphite:#6B6E73;
+  --cobalt:#2B4CF0;
+  --hair:rgba(22,24,27,.16);
+
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,"Roboto Mono",monospace;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--sans);-webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--cobalt);outline-offset:3px}
+
+.screen{position:fixed;inset:0;display:none;flex-direction:column}
+.screen.on{display:flex}
+
+/* ---------- 1. gate ---------- */
+#gate{align-items:center;justify-content:center;padding:24px}
+.gate-inner{width:min(340px,100%);text-align:center}
+.mark{
+  font-family:var(--mono);font-size:11px;letter-spacing:.32em;text-transform:uppercase;
+  color:var(--graphite);margin-bottom:52px
+}
+.gate-label{font-family:var(--serif);font-size:26px;letter-spacing:-.01em;margin-bottom:28px}
+#pw{
+  width:100%;background:none;border:0;border-bottom:1px solid var(--hair);
+  font-family:var(--mono);font-size:17px;letter-spacing:.5em;text-align:center;
+  padding:10px 0 12px;color:var(--ink);caret-color:var(--cobalt);
+  transition:border-color .2s;
+}
+#pw:focus{outline:none;border-bottom-color:var(--cobalt)}
+#pw::placeholder{letter-spacing:.2em;color:rgba(22,24,27,.25)}
+.gate-note{
+  margin-top:18px;font-size:12.5px;color:var(--graphite);min-height:18px;
+  transition:color .2s
+}
+.gate-note.err{color:#B3321F}
+.shake{animation:shake .38s}
+@keyframes shake{
+  0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)}
+  40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(2px)}
+}
+
+/* ---------- 2. choice ---------- */
+#choice{justify-content:center}
+.choice-head{
+  position:absolute;top:0;left:0;right:0;padding:26px 28px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.32em;text-transform:uppercase;
+  color:var(--graphite)
+}
+.choices{display:flex;flex:1;align-items:stretch}
+.choice{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;padding:40px 20px;transition:background .35s;position:relative
+}
+.choice + .choice{border-left:1px solid var(--hair)}
+.choice:hover,.choice:focus-visible{background:var(--paper-deep)}
+.choice .name{
+  font-family:var(--serif);font-size:clamp(38px,7vw,72px);line-height:1;letter-spacing:-.02em
+}
+.choice .meta{
+  font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--graphite);opacity:0;transform:translateY(6px);transition:.35s
+}
+.choice:hover .meta,.choice:focus-visible .meta{opacity:1;transform:none}
+
+/* ---------- 3. viewer ---------- */
+#viewer{background:var(--paper)}
+.bar{
+  height:52px;flex:0 0 52px;display:flex;align-items:center;gap:16px;
+  padding:0 18px;border-bottom:1px solid var(--hair);
+  background:var(--paper);z-index:5
+}
+.bar .back{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--graphite)}
+.bar .back:hover{color:var(--ink)}
+.bar .title{
+  flex:1;text-align:center;font-family:var(--serif);font-size:15px;letter-spacing:.01em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.modes{display:flex;border:1px solid var(--hair);border-radius:2px;overflow:hidden}
+.modes button{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  padding:6px 11px;color:var(--graphite);transition:.2s
+}
+.modes button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+
+.stage{flex:1;position:relative;overflow:hidden}
+
+/* book */
+.book{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:clamp(16px,4vh,44px)}
+.book img{
+  max-width:100%;max-height:100%;object-fit:contain;
+  box-shadow:0 1px 2px rgba(22,24,27,.10),0 18px 40px -20px rgba(22,24,27,.32);
+  background:#fff;user-select:none;-webkit-user-drag:none
+}
+.book img.turn{animation:turn .34s cubic-bezier(.22,.61,.36,1)}
+.book img.turn-back{animation:turnBack .34s cubic-bezier(.22,.61,.36,1)}
+@keyframes turn{from{opacity:0;transform:translateX(26px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes turnBack{from{opacity:0;transform:translateX(-26px) scale(.985)}to{opacity:1;transform:none}}
+.tap{position:absolute;top:0;bottom:0;width:34%;cursor:pointer}
+.tap.prev{left:0}.tap.next{right:0}
+
+/* scroll */
+.scroll{position:absolute;inset:0;overflow-y:auto;scroll-behavior:smooth;padding:clamp(16px,4vh,44px) 0;display:none}
+.scroll.on{display:block}
+.book.off{display:none}
+.scroll figure{margin:0 auto clamp(14px,3vh,32px);width:min(1080px,92%)}
+.scroll img{
+  width:100%;display:block;background:#fff;aspect-ratio:16/9;
+  box-shadow:0 1px 2px rgba(22,24,27,.10),0 14px 32px -22px rgba(22,24,27,.30)
+}
+.choice[aria-disabled="true"]{opacity:.4;cursor:default;pointer-events:none}
+.choice[aria-disabled="true"]:hover,.choice[aria-disabled="true"]:focus-visible{background:none}
+
+/* signature: page-edge stack */
+.edge{
+  position:absolute;right:0;top:0;bottom:0;width:34px;z-index:4;
+  display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:5px;
+  padding-right:9px
+}
+.edge button{height:2px;background:var(--hair);border-radius:1px;transition:width .22s,background .22s;width:9px;padding:0}
+.edge button:hover{width:17px;background:var(--graphite)}
+.edge button[aria-current="true"]{width:22px;background:var(--cobalt)}
+.count{
+  position:absolute;right:34px;bottom:16px;z-index:4;
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--graphite)
+}
+@media (max-width:640px){
+  .edge{display:none}
+  .count{right:14px}
+  .choices{flex-direction:column}
+  .choice + .choice{border-left:0;border-top:1px solid var(--hair)}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .scroll{scroll-behavior:auto}
+}
+</style>
+
+<!-- ===== 1. PASSWORD ===== -->
+<section id="gate" class="screen on">
+  <div class="gate-inner">
+    <div class="mark" id="brand">ARTAKIA</div>
+    <div class="gate-label">Enter the password to continue</div>
+    <input id="pw" type="password" inputmode="text" autocomplete="off" placeholder="••••••••" aria-label="Password">
+    <div class="gate-note" id="note">Ask your contact for access.</div>
+  </div>
+</section>
+
+<!-- ===== 2. LANGUAGE ===== -->
+<section id="choice" class="screen">
+  <div class="choice-head">Choose a version</div>
+  <div class="choices">
+    <button class="choice" data-deck="en">
+      <span class="name">English</span>
+      <span class="meta" data-meta="en"></span>
+    </button>
+    <button class="choice" data-deck="fr">
+      <span class="name">Français</span>
+      <span class="meta" data-meta="fr"></span>
+    </button>
+  </div>
+</section>
+
+<!-- ===== 3. VIEWER ===== -->
+<section id="viewer" class="screen">
+  <header class="bar">
+    <button class="back" id="back">← Versions</button>
+    <div class="title" id="deckTitle"></div>
+    <div class="modes">
+      <button id="mPage" aria-pressed="true">Page</button>
+      <button id="mScroll" aria-pressed="false">Scroll</button>
+    </div>
+  </header>
+  <div class="stage">
+    <div class="book" id="book">
+      <img id="slide" alt="">
+      <div class="tap prev" id="tapPrev" aria-hidden="true"></div>
+      <div class="tap next" id="tapNext" aria-hidden="true"></div>
+    </div>
+    <div class="scroll" id="scroll"></div>
+    <nav class="edge" id="edge" aria-label="Slides"></nav>
+    <div class="count" id="count"></div>
+  </div>
+</section>
+
+<script>
+/* ==========================================================
+   CONFIG — заміни на свої дані
+   ========================================================== */
+const PASSWORD = "deck2026";
+
+const DECKS = {
+  en: { title: "ARTAKIA — English", slides: [
+    "slides/en/0.webp",
+    "slides/en/1.webp",
+    "slides/en/2.webp",
+    "slides/en/3.webp",
+    "slides/en/4.webp",
+    "slides/en/5.webp",
+    "slides/en/6.webp",
+    "slides/en/7.webp",
+    "slides/en/8.webp",
+    "slides/en/9.webp",
+    "slides/en/10.webp",
+    "slides/en/11@2x.webp",
+    "slides/en/12@2x.webp",
+    "slides/en/13@2x.webp",
+    "slides/en/14@2x.webp",
+    "slides/en/15@2x.webp",
+    "slides/en/16@2x.webp",
+    "slides/en/17@2x.webp",
+    "slides/en/18@2x.webp",
+    "slides/en/19@2x.webp",
+    "slides/en/20@2x.webp",
+    "slides/en/21@2x.webp",
+    "slides/en/22@2x.webp",
+    "slides/en/23@2x.webp",
+    "slides/en/24@2x.webp",
+    "slides/en/25@2x.webp",
+    "slides/en/26@2x.webp",
+    "slides/en/27@2x.webp",
+    "slides/en/28@2x.webp",
+    "slides/en/29@2x.webp",
+    "slides/en/30@2x.webp",
+    "slides/en/31.webp",
+    "slides/en/32.webp",
+    "slides/en/33.webp",
+    "slides/en/34.webp",
+    "slides/en/35.webp",
+    "slides/en/36.webp",
+    "slides/en/37.webp",
+    "slides/en/38.webp",
+    "slides/en/39.webp",
+    "slides/en/40.webp",
+    "slides/en/41.webp",
+    "slides/en/42.webp"
+  ]},
+  fr: { title: "ARTAKIA — Français", slides: [
+    "slides/fr/0.webp",
+    "slides/fr/1.webp",
+    "slides/fr/2.webp",
+    "slides/fr/3.webp",
+    "slides/fr/4.webp",
+    "slides/fr/5.webp",
+    "slides/fr/6.webp",
+    "slides/fr/7.webp",
+    "slides/fr/8.webp",
+    "slides/fr/9.webp",
+    "slides/fr/10.webp",
+    "slides/fr/11.webp",
+    "slides/fr/12.webp",
+    "slides/fr/13.webp",
+    "slides/fr/14.webp",
+    "slides/fr/15.webp",
+    "slides/fr/16.webp",
+    "slides/fr/17.webp",
+    "slides/fr/18.webp",
+    "slides/fr/19.webp",
+    "slides/fr/20.webp",
+    "slides/fr/21.webp",
+    "slides/fr/22.webp",
+    "slides/fr/23.webp",
+    "slides/fr/24.webp",
+    "slides/fr/25.webp",
+    "slides/fr/26.webp",
+    "slides/fr/27.webp",
+    "slides/fr/28.webp",
+    "slides/fr/29.webp",
+    "slides/fr/30.webp",
+    "slides/fr/31.webp",
+    "slides/fr/32.webp",
+    "slides/fr/33.webp",
+    "slides/fr/34.webp",
+    "slides/fr/35.webp",
+    "slides/fr/36.webp",
+    "slides/fr/37.webp",
+    "slides/fr/38.webp",
+    "slides/fr/39.webp",
+    "slides/fr/40.webp",
+    "slides/fr/41.webp",
+    "slides/fr/42.webp"
+  ]}
+};
+
+const PLACEHOLDER_COUNT = 12;
+/* ========================================================== */
+
+// placeholders поки немає справжніх слайдів
+const ph = (n, lang) => "data:image/svg+xml;utf8," + encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+     <rect width="1600" height="900" fill="#ffffff"/>
+     <rect x="1" y="1" width="1598" height="898" fill="none" stroke="#E2E0DA"/>
+     <text x="96" y="150" font-family="ui-monospace,Menlo,monospace" font-size="26" letter-spacing="9" fill="#9B9EA3">${lang.toUpperCase()}</text>
+     <text x="96" y="470" font-family="Georgia,serif" font-size="150" fill="#16181B">${String(n).padStart(2,"0")}</text>
+     <text x="96" y="540" font-family="ui-monospace,Menlo,monospace" font-size="22" letter-spacing="5" fill="#6B6E73">SLIDE PLACEHOLDER</text>
+   </svg>`);
+
+for (const k of Object.keys(DECKS))
+  if (!DECKS[k].slides.length)
+    DECKS[k].slides = Array.from({length: PLACEHOLDER_COUNT}, (_, i) => ph(i + 1, k));
+
+const $ = s => document.querySelector(s);
+const show = id => document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === id));
+
+for (const k of Object.keys(DECKS)) {
+  const btn = document.querySelector(`[data-deck="${k}"]`);
+  const meta = document.querySelector(`[data-meta="${k}"]`);
+  if (btn && btn.getAttribute("aria-disabled") === "true")
+    meta.textContent = "Coming soon";
+  else
+    meta.textContent = DECKS[k].slides.length + " slides";
+}
+
+/* --- gate --- */
+const pw = $("#pw"), note = $("#note");
+pw.focus();
+pw.addEventListener("keydown", e => {
+  if (e.key !== "Enter") return;
+  if (pw.value === PASSWORD) { show("choice"); }
+  else {
+    note.textContent = "Wrong password. Try again.";
+    note.classList.add("err");
+    $(".gate-inner").classList.remove("shake");
+    void $(".gate-inner").offsetWidth;
+    $(".gate-inner").classList.add("shake");
+    pw.select();
+  }
+});
+pw.addEventListener("input", () => { note.textContent = "Ask your contact for access."; note.classList.remove("err"); });
+
+/* --- viewer --- */
+let deck = null, i = 0, mode = "page";
+
+document.querySelectorAll(".choice").forEach(b => b.onclick = () => {
+  if (b.getAttribute("aria-disabled") === "true") return;
+  open(b.dataset.deck);
+});
+$("#back").onclick = () => show("choice");
+
+function open(key){
+  deck = DECKS[key]; i = 0;
+  $("#deckTitle").textContent = deck.title;
+
+  $("#edge").innerHTML = "";
+  deck.slides.forEach((_, n) => {
+    const b = document.createElement("button");
+    b.setAttribute("aria-label", "Slide " + (n + 1));
+    b.onclick = () => go(n);
+    $("#edge").append(b);
+  });
+
+  $("#scroll").innerHTML = "";
+  deck.slides.forEach((src, n) => {
+    const f = document.createElement("figure");
+    f.innerHTML = `<img src="${src}" alt="Slide ${n+1}" loading="${n === 0 ? 'eager' : 'lazy'}">`;
+    $("#scroll").append(f);
+  });
+
+  render();
+  show("viewer");
+}
+
+function render(dir){
+  const img = $("#slide");
+  img.src = deck.slides[i];
+  img.alt = "Slide " + (i + 1);
+  if (dir){ img.classList.remove("turn","turn-back"); void img.offsetWidth;
+            img.classList.add(dir > 0 ? "turn" : "turn-back"); }
+  $("#count").textContent = String(i+1).padStart(2,"0") + " / " + String(deck.slides.length).padStart(2,"0");
+  [...$("#edge").children].forEach((b, n) => b.setAttribute("aria-current", n === i));
+  if (deck.slides[i + 1]) { const p = new Image(); p.src = deck.slides[i + 1]; }
+  if (deck.slides[i - 1]) { const p = new Image(); p.src = deck.slides[i - 1]; }
+}
+
+function go(n, dir){
+  if (n < 0 || n >= deck.slides.length) return;
+  const d = dir ?? Math.sign(n - i); i = n;
+  if (mode === "page") render(d);
+  else { $("#scroll").children[i].scrollIntoView({block:"start"}); render(); }
+}
+
+$("#tapNext").onclick = () => go(i + 1, 1);
+$("#tapPrev").onclick = () => go(i - 1, -1);
+
+function setMode(m){
+  mode = m;
+  $("#mPage").setAttribute("aria-pressed", m === "page");
+  $("#mScroll").setAttribute("aria-pressed", m === "scroll");
+  $("#book").classList.toggle("off", m === "scroll");
+  $("#scroll").classList.toggle("on", m === "scroll");
+  if (m === "scroll") $("#scroll").children[i]?.scrollIntoView({block:"start"});
+  else render();
+}
+$("#mPage").onclick = () => setMode("page");
+$("#mScroll").onclick = () => setMode("scroll");
+
+$("#scroll").addEventListener("scroll", () => {
+  if (mode !== "scroll") return;
+  const mid = $("#scroll").scrollTop + $("#scroll").clientHeight / 2;
+  [...$("#scroll").children].forEach((f, n) => {
+    if (f.offsetTop <= mid && f.offsetTop + f.offsetHeight > mid && n !== i){ i = n; render(); }
+  });
+}, {passive:true});
+
+addEventListener("keydown", e => {
+  if (!$("#viewer").classList.contains("on")) return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); go(i + 1, 1); }
+  if (e.key === "ArrowLeft")  go(i - 1, -1);
+  if (e.key === "Escape") show("choice");
+});
+
+// свайп на мобільному
+let x0 = null;
+$(".stage").addEventListener("touchstart", e => x0 = e.touches[0].clientX, {passive:true});
+$(".stage").addEventListener("touchend", e => {
+  if (x0 === null || mode !== "page") return;
+  const dx = e.changedTouches[0].clientX - x0;
+  if (Math.abs(dx) > 55) go(i + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
+  x0 = null;
+}, {passive:true});
+</script>

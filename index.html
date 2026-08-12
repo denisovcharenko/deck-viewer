@@ -4,12 +4,12 @@
 
 <style>
 :root{
-  --paper:#E9E7E2;
-  --paper-deep:#DFDCD5;
-  --ink:#16181B;
-  --graphite:#6B6E73;
-  --cobalt:#2B4CF0;
-  --hair:rgba(22,24,27,.16);
+  --paper:#111113;
+  --paper-deep:#1C1C1F;
+  --ink:#EDECEA;
+  --graphite:#909399;
+  --cobalt:#5B78F5;
+  --hair:rgba(255,255,255,.10);
 
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
   --sans:system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
@@ -44,12 +44,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   transition:border-color .2s;
 }
 #pw:focus{outline:none;border-bottom-color:var(--cobalt)}
-#pw::placeholder{letter-spacing:.2em;color:rgba(22,24,27,.25)}
+#pw::placeholder{letter-spacing:.2em;color:rgba(255,255,255,.20)}
 .gate-note{
   margin-top:18px;font-size:12.5px;color:var(--graphite);min-height:18px;
   transition:color .2s
 }
-.gate-note.err{color:#B3321F}
+.gate-note.err{color:#E05540}
 .shake{animation:shake .38s}
 @keyframes shake{
   0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)}
@@ -105,7 +105,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .book{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:clamp(16px,4vh,44px)}
 .book img{
   max-width:100%;max-height:100%;object-fit:contain;
-  box-shadow:0 1px 2px rgba(22,24,27,.10),0 18px 40px -20px rgba(22,24,27,.32);
+  box-shadow:0 0 0 1px rgba(255,255,255,.06),0 24px 48px -16px rgba(0,0,0,.60);
   background:#fff;user-select:none;-webkit-user-drag:none
 }
 .book img.turn{animation:turn .34s cubic-bezier(.22,.61,.36,1)}
@@ -122,7 +122,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .scroll figure{margin:0 auto clamp(14px,3vh,32px);width:min(1080px,92%)}
 .scroll img{
   width:100%;display:block;background:#fff;aspect-ratio:16/9;
-  box-shadow:0 1px 2px rgba(22,24,27,.10),0 14px 32px -22px rgba(22,24,27,.30)
+  box-shadow:0 0 0 1px rgba(255,255,255,.06),0 16px 36px -16px rgba(0,0,0,.50)
 }
 .choice[aria-disabled="true"]{opacity:.4;cursor:default;pointer-events:none}
 .choice[aria-disabled="true"]:hover,.choice[aria-disabled="true"]:focus-visible{background:none}

@@ -128,7 +128,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .tap.prev{left:0}.tap.next{right:0}
 
 /* scroll */
-.scroll{position:absolute;inset:0;overflow-y:auto;scroll-behavior:smooth;padding:clamp(16px,4vh,44px) 0;display:none}
+.scroll{position:absolute;inset:0;overflow-y:auto;scroll-behavior:smooth;padding:clamp(16px,4vh,44px) 0;display:none;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
 .scroll.on{display:block}
 .book.off{display:none}
 .scroll figure{margin:0 auto clamp(14px,3vh,32px);width:min(1080px,92%)}

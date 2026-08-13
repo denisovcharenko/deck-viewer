@@ -126,6 +126,15 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 @keyframes turnBack{from{opacity:0;transform:translateX(-26px) scale(.985)}to{opacity:1;transform:none}}
 .tap{position:absolute;top:0;bottom:0;width:34%;cursor:pointer}
 .tap.prev{left:0}.tap.next{right:0}
+.tap::after{
+  position:absolute;top:50%;transform:translateY(-50%);
+  font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink);opacity:.18;transition:opacity .25s;pointer-events:none;white-space:nowrap
+}
+.tap:hover::after{opacity:.55}
+.tap.prev::after{content:'← Back';right:14px}
+.tap.next::after{content:'Next →';left:14px}
+@media(max-width:640px){.tap::after{opacity:.28}}
 
 /* scroll */
 .scroll{position:absolute;inset:0;overflow-y:auto;scroll-behavior:smooth;padding:clamp(16px,4vh,44px) 0;display:none;scrollbar-width:none}

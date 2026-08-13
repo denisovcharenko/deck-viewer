@@ -381,7 +381,10 @@ function setMode(m){
   $("#mScroll").setAttribute("aria-pressed", m === "scroll");
   $("#book").classList.toggle("off", m === "scroll");
   $("#scroll").classList.toggle("on", m === "scroll");
-  if (m !== "scroll") render();
+  if (m === "scroll") {
+    const el = $("#scroll").children[i];
+    if (el) $("#scroll").scrollTop = el.offsetTop;
+  } else render();
 }
 $("#mPage").onclick = () => setMode("page");
 $("#mScroll").onclick = () => setMode("scroll");

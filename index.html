@@ -126,15 +126,19 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 @keyframes turnBack{from{opacity:0;transform:translateX(-26px) scale(.985)}to{opacity:1;transform:none}}
 .tap{position:absolute;top:0;bottom:0;width:34%;cursor:pointer}
 .tap.prev{left:0}.tap.next{right:0}
-.tap::after{
-  position:absolute;top:50%;transform:translateY(-50%);
-  font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--ink);opacity:.18;transition:opacity .25s;pointer-events:none;white-space:nowrap
+.tap{cursor:none}
+#nav-cursor{
+  position:fixed;pointer-events:none;z-index:999;
+  font-family:var(--mono);font-size:22px;letter-spacing:.05em;
+  display:none;transform:translate(-50%,-50%);user-select:none;
+  line-height:1
 }
-.tap:hover::after{opacity:.55}
-.tap.prev::after{content:'← Back';right:14px}
-.tap.next::after{content:'Next →';left:14px}
-@media(max-width:640px){.tap::after{opacity:.28}}
+#nav-cursor.on{display:block}
+#nav-cursor .nl,#nav-cursor .nr{
+  color:var(--ink);opacity:.2;transition:opacity .15s
+}
+#nav-cursor.is-prev .nl{opacity:1}
+#nav-cursor.is-next .nr{opacity:1}
 
 /* scroll */
 .scroll{position:absolute;inset:0;overflow-y:auto;scroll-behavior:smooth;padding:clamp(16px,4vh,44px) 0;display:none;scrollbar-width:none}
@@ -223,6 +227,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     <div class="count" id="count"></div>
   </div>
 </section>
+
+<div id="nav-cursor" aria-hidden="true"><span class="nl">&lt;</span>&thinsp;<span class="nr">&gt;</span></div>
 
 <script>
 /* ==========================================================
@@ -388,6 +394,25 @@ addEventListener("keydown", e => {
   if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); go(i + 1, 1); }
   if (e.key === "ArrowLeft")  go(i - 1, -1);
   if (e.key === "Escape") show("choice");
+});
+
+// кастомний курсор < >
+const navCursor = document.getElementById("nav-cursor");
+document.addEventListener("mousemove", e => {
+  navCursor.style.left = e.clientX + "px";
+  navCursor.style.top  = e.clientY + "px";
+});
+["#tapPrev","#tapNext"].forEach(sel => {
+  const el = $(sel);
+  const isPrev = sel === "#tapPrev";
+  el.addEventListener("mouseenter", () => {
+    if (mode !== "page") return;
+    navCursor.classList.add("on", isPrev ? "is-prev" : "is-next");
+    navCursor.classList.remove(isPrev ? "is-next" : "is-prev");
+  });
+  el.addEventListener("mouseleave", () => {
+    navCursor.classList.remove("on","is-prev","is-next");
+  });
 });
 
 // свайп на мобільному

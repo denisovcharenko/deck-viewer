@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Deck</title>
+<title>Deck Viewer</title>
 
 <style>
 @font-face{font-family:"Syne-Bold";src:url("fonts/Syne-Bold.ttf")}
@@ -169,7 +169,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 <!-- ===== 1. PASSWORD ===== -->
 <section id="gate" class="screen on">
   <div class="gate-inner">
-    <div class="mark" id="brand">ARTAKIA</div>
     <div class="gate-label">Enter the password to continue</div>
     <input id="pw" type="password" inputmode="text" autocomplete="off" placeholder="••••••••" aria-label="Password">
     <button class="gate-btn" id="submit-btn">Continue →</button>
@@ -221,7 +220,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 const PASSWORD = "deck2026";
 
 const DECKS = {
-  en: { title: "ARTAKIA — English", slides: [
+  en: { title: "English", slides: [
     "slides/en/0.webp",
     "slides/en/1.webp",
     "slides/en/2.webp",
@@ -266,7 +265,7 @@ const DECKS = {
     "slides/en/41.webp",
     "slides/en/42.webp"
   ]},
-  fr: { title: "ARTAKIA — Français", slides: [
+  fr: { title: "Français", slides: [
     "slides/fr/0.webp",
     "slides/fr/1.webp",
     "slides/fr/2.webp",

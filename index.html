@@ -170,6 +170,15 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   position:absolute;right:34px;bottom:16px;z-index:4;
   font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--graphite)
 }
+#to-top{
+  position:absolute;right:18px;bottom:52px;z-index:4;
+  width:30px;height:30px;border-radius:2px;border:1px solid var(--hair);
+  font-family:var(--mono);font-size:15px;color:var(--graphite);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s,color .2s,border-color .2s
+}
+#to-top.on{opacity:1;pointer-events:auto}
+#to-top:hover{color:var(--ink);border-color:rgba(255,255,255,.3)}
 @media (max-width:640px){
   .edge{display:none}
   .count{right:14px}
@@ -229,6 +238,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     <div class="scroll" id="scroll"></div>
     <nav class="edge" id="edge" aria-label="Slides"></nav>
     <div class="count" id="count"></div>
+    <button id="to-top" aria-label="Back to top">↑</button>
   </div>
 </section>
 
@@ -384,7 +394,10 @@ function setMode(m){
   if (m === "scroll") {
     const el = $("#scroll").children[i];
     if (el) $("#scroll").scrollTop = el.offsetTop;
-  } else render();
+  } else {
+    $("#to-top").classList.remove("on");
+    render();
+  }
 }
 $("#mPage").onclick = () => setMode("page");
 $("#mScroll").onclick = () => setMode("scroll");
@@ -395,7 +408,10 @@ $("#scroll").addEventListener("scroll", () => {
   [...$("#scroll").children].forEach((f, n) => {
     if (f.offsetTop <= mid && f.offsetTop + f.offsetHeight > mid && n !== i){ i = n; render(); }
   });
+  $("#to-top").classList.toggle("on", i >= Math.floor(deck.slides.length * 0.4));
 }, {passive:true});
+
+$("#to-top").onclick = () => { $("#scroll").scrollTop = 0; };
 
 addEventListener("keydown", e => {
   if (!$("#viewer").classList.contains("on")) return;

@@ -216,138 +216,77 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
 <script>
 /* ==========================================================
-   CONFIG — заміни на свої дані
+   CONFIG — заміни паролі на свої
    ========================================================== */
-const PASSWORD = "deck2026";
-
-const DECKS = {
-  en: { title: "English", slides: [
-    "slides/en/0.webp",
-    "slides/en/1.webp",
-    "slides/en/2.webp",
-    "slides/en/3.webp",
-    "slides/en/4.webp",
-    "slides/en/5.webp",
-    "slides/en/6.webp",
-    "slides/en/7.webp",
-    "slides/en/8.webp",
-    "slides/en/9.webp",
-    "slides/en/10.webp",
-    "slides/en/11@2x.webp",
-    "slides/en/12@2x.webp",
-    "slides/en/13@2x.webp",
-    "slides/en/14@2x.webp",
-    "slides/en/15@2x.webp",
-    "slides/en/16@2x.webp",
-    "slides/en/17@2x.webp",
-    "slides/en/18@2x.webp",
-    "slides/en/19@2x.webp",
-    "slides/en/20@2x.webp",
-    "slides/en/21@2x.webp",
-    "slides/en/22@2x.webp",
-    "slides/en/23@2x.webp",
-    "slides/en/24@2x.webp",
-    "slides/en/25@2x.webp",
-    "slides/en/26@2x.webp",
-    "slides/en/27@2x.webp",
-    "slides/en/28@2x.webp",
-    "slides/en/29@2x.webp",
-    "slides/en/30@2x.webp",
-    "slides/en/31.webp",
-    "slides/en/32.webp",
-    "slides/en/33.webp",
-    "slides/en/34.webp",
-    "slides/en/35.webp",
-    "slides/en/36.webp",
-    "slides/en/37.webp",
-    "slides/en/38.webp",
-    "slides/en/39.webp",
-    "slides/en/40.webp",
-    "slides/en/41.webp",
-    "slides/en/42.webp"
-  ]},
-  fr: { title: "Français", slides: [
-    "slides/fr/0.webp",
-    "slides/fr/1.webp",
-    "slides/fr/2.webp",
-    "slides/fr/3.webp",
-    "slides/fr/4.webp",
-    "slides/fr/5.webp",
-    "slides/fr/6.webp",
-    "slides/fr/7.webp",
-    "slides/fr/8.webp",
-    "slides/fr/9.webp",
-    "slides/fr/10.webp",
-    "slides/fr/11.webp",
-    "slides/fr/12.webp",
-    "slides/fr/13.webp",
-    "slides/fr/14.webp",
-    "slides/fr/15.webp",
-    "slides/fr/16.webp",
-    "slides/fr/17.webp",
-    "slides/fr/18.webp",
-    "slides/fr/19.webp",
-    "slides/fr/20.webp",
-    "slides/fr/21.webp",
-    "slides/fr/22.webp",
-    "slides/fr/23.webp",
-    "slides/fr/24.webp",
-    "slides/fr/25.webp",
-    "slides/fr/26.webp",
-    "slides/fr/27.webp",
-    "slides/fr/28.webp",
-    "slides/fr/29.webp",
-    "slides/fr/30.webp",
-    "slides/fr/31.webp",
-    "slides/fr/32.webp",
-    "slides/fr/33.webp",
-    "slides/fr/34.webp",
-    "slides/fr/35.webp",
-    "slides/fr/36.webp",
-    "slides/fr/37.webp",
-    "slides/fr/38.webp",
-    "slides/fr/39.webp",
-    "slides/fr/40.webp",
-    "slides/fr/41.webp",
-    "slides/fr/42.webp"
-  ]}
+const PASSWORDS = {
+  "deck2026":     "deck1",   // ← пароль 1
+  "tvmonaco2026": "deck2"    // ← пароль 2
 };
 
-const PLACEHOLDER_COUNT = 12;
+const PROJECTS = {
+  deck1: {
+    en: { title: "English",  slides: [
+      "slides/en/0.webp","slides/en/1.webp","slides/en/2.webp","slides/en/3.webp",
+      "slides/en/4.webp","slides/en/5.webp","slides/en/6.webp","slides/en/7.webp",
+      "slides/en/8.webp","slides/en/9.webp","slides/en/10.webp",
+      "slides/en/11@2x.webp","slides/en/12@2x.webp","slides/en/13@2x.webp",
+      "slides/en/14@2x.webp","slides/en/15@2x.webp","slides/en/16@2x.webp",
+      "slides/en/17@2x.webp","slides/en/18@2x.webp","slides/en/19@2x.webp",
+      "slides/en/20@2x.webp","slides/en/21@2x.webp","slides/en/22@2x.webp",
+      "slides/en/23@2x.webp","slides/en/24@2x.webp","slides/en/25@2x.webp",
+      "slides/en/26@2x.webp","slides/en/27@2x.webp","slides/en/28@2x.webp",
+      "slides/en/29@2x.webp","slides/en/30@2x.webp",
+      "slides/en/31.webp","slides/en/32.webp","slides/en/33.webp","slides/en/34.webp",
+      "slides/en/35.webp","slides/en/36.webp","slides/en/37.webp","slides/en/38.webp",
+      "slides/en/39.webp","slides/en/40.webp","slides/en/41.webp","slides/en/42.webp"
+    ]},
+    fr: { title: "Français", slides: [
+      "slides/fr/0.webp","slides/fr/1.webp","slides/fr/2.webp","slides/fr/3.webp",
+      "slides/fr/4.webp","slides/fr/5.webp","slides/fr/6.webp","slides/fr/7.webp",
+      "slides/fr/8.webp","slides/fr/9.webp","slides/fr/10.webp","slides/fr/11.webp",
+      "slides/fr/12.webp","slides/fr/13.webp","slides/fr/14.webp","slides/fr/15.webp",
+      "slides/fr/16.webp","slides/fr/17.webp","slides/fr/18.webp","slides/fr/19.webp",
+      "slides/fr/20.webp","slides/fr/21.webp","slides/fr/22.webp","slides/fr/23.webp",
+      "slides/fr/24.webp","slides/fr/25.webp","slides/fr/26.webp","slides/fr/27.webp",
+      "slides/fr/28.webp","slides/fr/29.webp","slides/fr/30.webp","slides/fr/31.webp",
+      "slides/fr/32.webp","slides/fr/33.webp","slides/fr/34.webp","slides/fr/35.webp",
+      "slides/fr/36.webp","slides/fr/37.webp","slides/fr/38.webp","slides/fr/39.webp",
+      "slides/fr/40.webp","slides/fr/41.webp","slides/fr/42.webp"
+    ]}
+  },
+  deck2: {
+    en: { title: "English",  slides: Array.from({length:22}, (_, i) => `slides/deck2/en/${i}.webp`) },
+    fr: { title: "Français", slides: Array.from({length:22}, (_, i) => `slides/deck2/fr/${i}.webp`) }
+  }
+};
 /* ========================================================== */
-
-// placeholders поки немає справжніх слайдів
-const ph = (n, lang) => "data:image/svg+xml;utf8," + encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
-     <rect width="1600" height="900" fill="#ffffff"/>
-     <rect x="1" y="1" width="1598" height="898" fill="none" stroke="#E2E0DA"/>
-     <text x="96" y="150" font-family="ui-monospace,Menlo,monospace" font-size="26" letter-spacing="9" fill="#9B9EA3">${lang.toUpperCase()}</text>
-     <text x="96" y="470" font-family="Georgia,serif" font-size="150" fill="#16181B">${String(n).padStart(2,"0")}</text>
-     <text x="96" y="540" font-family="ui-monospace,Menlo,monospace" font-size="22" letter-spacing="5" fill="#6B6E73">SLIDE PLACEHOLDER</text>
-   </svg>`);
-
-for (const k of Object.keys(DECKS))
-  if (!DECKS[k].slides.length)
-    DECKS[k].slides = Array.from({length: PLACEHOLDER_COUNT}, (_, i) => ph(i + 1, k));
 
 const $ = s => document.querySelector(s);
 const show = id => document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === id));
 
-for (const k of Object.keys(DECKS)) {
-  const btn = document.querySelector(`[data-deck="${k}"]`);
-  const meta = document.querySelector(`[data-meta="${k}"]`);
-  if (btn && btn.getAttribute("aria-disabled") === "true")
-    meta.textContent = "Coming soon";
-  else
-    meta.textContent = DECKS[k].slides.length + " slides";
+let currentProject = null;
+
+function updateMeta() {
+  for (const k of ["en", "fr"]) {
+    const btn = document.querySelector(`[data-deck="${k}"]`);
+    const meta = document.querySelector(`[data-meta="${k}"]`);
+    if (btn && btn.getAttribute("aria-disabled") === "true")
+      meta.textContent = "Coming soon";
+    else
+      meta.textContent = currentProject[k].slides.length + " slides";
+  }
 }
 
 /* --- gate --- */
 const pw = $("#pw"), note = $("#note");
 pw.focus();
 function tryPassword(){
-  if (pw.value === PASSWORD) { show("choice"); }
-  else {
+  const projectKey = PASSWORDS[pw.value];
+  if (projectKey) {
+    currentProject = PROJECTS[projectKey];
+    updateMeta();
+    show("choice");
+  } else {
     note.textContent = "Wrong password. Try again.";
     note.classList.add("err");
     $(".gate-inner").classList.remove("shake");
@@ -370,7 +309,7 @@ document.querySelectorAll(".choice").forEach(b => b.onclick = () => {
 $("#back").onclick = () => show("choice");
 
 function open(key){
-  deck = DECKS[key]; i = 0;
+  deck = currentProject[key]; i = 0;
   $("#deckTitle").textContent = deck.title;
 
   $("#edge").innerHTML = "";

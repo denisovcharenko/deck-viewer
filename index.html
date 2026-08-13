@@ -151,7 +151,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .scroll figure{margin:0 auto clamp(14px,3vh,32px);width:min(1080px,92%)}
 .scroll img{
   width:100%;display:block;background:#fff;aspect-ratio:16/9;
-  box-shadow:0 0 0 1px rgba(255,255,255,.06),0 16px 36px -16px rgba(0,0,0,.50)
+  box-shadow:0 0 0 1px rgba(255,255,255,.06),0 16px 36px -16px rgba(0,0,0,.50);
+  user-select:none;-webkit-user-drag:none
 }
 .choice[aria-disabled="true"]{opacity:.4;cursor:default;pointer-events:none}
 .choice[aria-disabled="true"]:hover,.choice[aria-disabled="true"]:focus-visible{background:none}
@@ -380,8 +381,7 @@ function setMode(m){
   $("#mScroll").setAttribute("aria-pressed", m === "scroll");
   $("#book").classList.toggle("off", m === "scroll");
   $("#scroll").classList.toggle("on", m === "scroll");
-  if (m === "scroll") $("#scroll").children[i]?.scrollIntoView({block:"start"});
-  else render();
+  if (m !== "scroll") render();
 }
 $("#mPage").onclick = () => setMode("page");
 $("#mScroll").onclick = () => setMode("scroll");

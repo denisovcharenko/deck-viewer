@@ -17,6 +17,8 @@
   --graphite:#909399;
   --cobalt:#c4d4de;
   --hair:rgba(255,255,255,.10);
+  --overlay-lo:rgba(0,0,0,.55);
+  --overlay-text:rgba(255,255,255,.55);
 
   --serif:"Syne-Bold","Iowan Old Style",Georgia,serif;
   --sans:system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
@@ -38,16 +40,16 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 @keyframes screenIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 
 /* ---------- 1. gate ---------- */
-#gate{align-items:center;justify-content:center;padding:24px}
+#gate{align-items:center;justify-content:center;padding:max(24px,env(safe-area-inset-top)) 24px max(24px,env(safe-area-inset-bottom))}
 .gate-inner{width:min(340px,100%);text-align:center}
 .mark{
   font-family:var(--mono);font-size:11px;letter-spacing:.32em;text-transform:uppercase;
-  color:var(--graphite);margin-bottom:52px;opacity:.35
+  color:var(--graphite);margin-bottom:52px;opacity:.6
 }
 .gate-label{font-family:var(--serif);font-size:26px;letter-spacing:-.01em;margin-bottom:28px}
 #pw{
   width:100%;background:none;border:0;border-bottom:1px solid var(--hair);
-  font-family:var(--mono);font-size:17px;letter-spacing:.5em;text-align:center;
+  font-family:var(--mono);font-size:17px;letter-spacing:.32em;text-align:center;
   padding:10px 0 12px;color:var(--ink);caret-color:var(--cobalt);
   transition:border-color .2s;
 }
@@ -76,7 +78,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 /* ---------- 2. choice ---------- */
 #choice{justify-content:center}
 .choice-head{
-  position:absolute;top:0;left:0;right:0;padding:26px 28px;z-index:1;
+  position:absolute;top:0;left:0;right:0;padding:calc(26px + env(safe-area-inset-top)) 28px 26px;z-index:1;
   font-family:var(--mono);font-size:11px;letter-spacing:.32em;text-transform:uppercase;
   color:var(--graphite)
 }
@@ -88,7 +90,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   gap:14px;padding:40px 20px;transition:background .35s;position:relative
 }
 .choice + .choice{border-left:1px solid var(--hair)}
-.choice:hover,.choice:focus-visible{background:var(--paper-deep)}
+.choice:focus-visible{background:var(--paper-deep)}
 .choice .name{
   font-family:var(--serif);font-size:clamp(38px,7vw,72px);line-height:1;letter-spacing:-.02em
 }
@@ -96,13 +98,20 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
   color:var(--graphite);opacity:0;transform:translateY(6px);transition:.35s
 }
-.choice:hover .meta,.choice:focus-visible .meta{opacity:1;transform:none}
+.choice:focus-visible .meta{opacity:1;transform:none}
+@media(hover:hover){
+  .choice:hover{background:var(--paper-deep)}
+  .choice:hover .meta{opacity:1;transform:none}
+}
 
 /* ---------- 3. viewer ---------- */
 #viewer{background:var(--paper)}
 .bar{
-  height:52px;flex:0 0 52px;display:flex;align-items:center;gap:16px;
-  padding:0 18px;border-bottom:1px solid var(--hair);
+  height:calc(52px + env(safe-area-inset-top));
+  flex:0 0 calc(52px + env(safe-area-inset-top));
+  display:flex;align-items:center;gap:16px;
+  padding:env(safe-area-inset-top) max(18px,env(safe-area-inset-right)) 0 max(18px,env(safe-area-inset-left));
+  border-bottom:1px solid var(--hair);
   background:var(--paper);z-index:5
 }
 .bar .back{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--graphite)}
@@ -113,8 +122,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 }
 .modes{display:flex;border:1px solid var(--hair);border-radius:2px;overflow:hidden}
 .modes button{
-  font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
-  padding:6px 11px;color:var(--graphite);transition:.2s
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  padding:0 12px;height:44px;display:flex;align-items:center;
+  color:var(--graphite);transition:.2s
 }
 .modes button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 
@@ -154,25 +164,26 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 @keyframes shimmer{from{background-position:-200% center}to{background-position:200% center}}
 
 /* scroll */
-.scroll{position:absolute;inset:0;overflow-y:auto;scroll-behavior:smooth;padding:clamp(16px,4vh,44px) 0;display:block;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;scrollbar-width:none}
+.scroll{position:absolute;inset:0;overflow-y:auto;scroll-behavior:smooth;padding:clamp(16px,4vh,44px) 0 calc(clamp(16px,4vh,44px) + env(safe-area-inset-bottom));display:block;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;scrollbar-width:none}
 .scroll::-webkit-scrollbar{display:none}
 .scroll.on{opacity:1;visibility:visible}
 .book.off{opacity:0;visibility:hidden;pointer-events:none}
 
 /* grid */
-.grid{position:absolute;inset:0;overflow-y:auto;padding:clamp(12px,2.5vh,28px);display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:clamp(6px,1.2vw,14px);align-content:start;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;scrollbar-width:none}
+.grid{position:absolute;inset:0;overflow-y:auto;padding:clamp(12px,2.5vh,28px) clamp(12px,2.5vh,28px) calc(clamp(12px,2.5vh,28px) + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:clamp(6px,1.2vw,14px);align-content:start;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;scrollbar-width:none}
 .grid::-webkit-scrollbar{display:none}
 .grid.on{opacity:1;visibility:visible}
 .grid-item{cursor:pointer;position:relative;border-radius:2px;overflow:hidden;border:2px solid transparent;opacity:0;transition:border-color .18s,transform .2s}
 .grid-item::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,var(--paper-deep) 20%,rgba(255,255,255,.13) 50%,var(--paper-deep) 80%);background-size:300% 100%;animation:shimmer 1.6s ease-in-out infinite;transition:opacity .35s}
 .grid-item.loaded::before{opacity:0;animation:none}
-.grid-item:hover{border-color:var(--graphite);transform:scale(1.03)}
+.grid-item:focus-visible{outline-offset:-3px}
+@media(hover:hover){.grid-item:hover{border-color:var(--graphite);transform:scale(1.03)}}
 .grid-item[aria-current="true"]{border-color:var(--cobalt)}
 @keyframes gridTileIn{to{opacity:1}}
 .grid.on .grid-item{animation:gridTileIn .38s cubic-bezier(0.16,1,0.3,1) forwards;animation-delay:calc(var(--n,0)*8ms)}
 .grid-item img{width:100%;display:block;background:#fff;aspect-ratio:16/9;user-select:none;-webkit-user-drag:none;opacity:0;transition:opacity .42s;position:relative;z-index:2}
 .grid-item.loaded img{opacity:1}
-.grid-item .num{position:absolute;bottom:0;left:0;right:0;padding:3px 6px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:rgba(255,255,255,.55);background:linear-gradient(transparent,rgba(0,0,0,.55));text-align:center;z-index:3}
+.grid-item .num{position:absolute;bottom:0;left:0;right:0;padding:3px 6px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--overlay-text);background:linear-gradient(transparent,var(--overlay-lo));text-align:center;z-index:3}
 .scroll figure{margin:0 auto clamp(14px,3vh,32px);width:min(1080px,92%);position:relative}
 .scroll figure::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,var(--paper-deep) 20%,rgba(255,255,255,.13) 50%,var(--paper-deep) 80%);background-size:300% 100%;animation:shimmer 1.6s ease-in-out infinite;transition:opacity .35s}
 .scroll figure.loaded::before{opacity:0;animation:none}
@@ -200,11 +211,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .edge button:hover{transform:scaleX(0.77);background:var(--graphite)}
 .edge button[aria-current="true"]{transform:scaleX(1);background:var(--cobalt)}
 .count{
-  position:absolute;right:34px;bottom:16px;z-index:4;
-  font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--graphite)
+  position:absolute;right:34px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:4;
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--graphite);transition:color .3s
 }
+.count.is-end{color:var(--cobalt)}
 #to-top{
-  position:absolute;right:18px;bottom:52px;z-index:4;
+  position:absolute;right:18px;bottom:calc(52px + env(safe-area-inset-bottom));z-index:4;
   width:30px;height:30px;border-radius:2px;border:1px solid var(--hair);
   font-family:var(--mono);font-size:15px;color:var(--graphite);
   display:flex;align-items:center;justify-content:center;
@@ -214,11 +226,31 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 #to-top:hover{color:var(--ink);border-color:rgba(255,255,255,.3)}
 @media (max-width:640px){
   .edge{display:none}
-  .count{right:14px}
+  .count{right:max(14px,env(safe-area-inset-right))}
   .choices{flex-direction:column}
   .choice + .choice{border-left:0;border-top:1px solid var(--hair)}
-  .book{padding:0}
+  .book{padding:clamp(8px,2vw,16px)}
   .book img{box-shadow:none}
+  .bar{gap:10px}
+  #to-top{right:max(14px,env(safe-area-inset-right))}
+}
+@media (max-width:360px){
+  .bar .title{display:none}
+  .modes button{padding:0 9px}
+}
+@media (max-height:500px){
+  .bar{height:calc(44px + env(safe-area-inset-top));flex:0 0 calc(44px + env(safe-area-inset-top))}
+  .book{padding:clamp(4px,1vh,8px)}
+}
+@media(hover:none){
+  .book::after{
+    content:'swipe';position:absolute;bottom:clamp(20px,5vh,40px);left:50%;
+    transform:translateX(-50%);pointer-events:none;z-index:10;
+    font-family:var(--mono);font-size:9px;letter-spacing:.3em;text-transform:uppercase;
+    color:rgba(255,255,255,.3);
+    animation:swipeHint 3s ease-out 1.5s both
+  }
+  @keyframes swipeHint{0%,40%{opacity:1}100%{opacity:0}}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:50ms!important}
@@ -231,7 +263,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <div class="gate-inner">
     <div class="mark">TVMonaco • ESC</div>
     <div class="gate-label">Enter the password to continue</div>
-    <input id="pw" type="password" inputmode="text" autocomplete="off" placeholder="••••••••" aria-label="Password">
+    <input id="pw" type="password" autocomplete="off" placeholder="••••••••" aria-label="Password">
     <button class="gate-btn" id="submit-btn">Continue →</button>
     <div class="gate-note" id="note">Ask your contact for access.</div>
   </div>
@@ -365,7 +397,7 @@ $("#submit-btn").addEventListener("click", tryPassword);
 pw.addEventListener("input", () => { note.textContent = "Ask your contact for access."; note.classList.remove("err"); });
 
 /* --- viewer --- */
-let deck = null, i = 0, mode = "page";
+let deck = null, i = 0, mode = "page", scrollOffsets = [];
 
 document.querySelectorAll(".choice").forEach(b => b.onclick = () => {
   if (b.getAttribute("aria-disabled") === "true") return;
@@ -401,15 +433,20 @@ function open(key){
     const item = document.createElement("div");
     item.className = "grid-item";
     item.style.setProperty("--n", Math.min(n, 24));
+    item.setAttribute("role", "button");
+    item.setAttribute("tabindex", "0");
     item.setAttribute("aria-label", "Slide " + (n + 1));
     item.innerHTML = `<img src="${src}" alt="Slide ${n+1}" loading="lazy"><span class="num">${n + 1}</span>`;
     const img = item.querySelector("img");
     if (img.complete && img.naturalWidth) item.classList.add("loaded");
     else img.onload = () => item.classList.add("loaded");
-    item.onclick = () => { go(n); setMode("page"); };
+    const activate = () => { go(n); setMode("page"); };
+    item.onclick = activate;
+    item.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); activate(); } });
     $("#grid").append(item);
   });
 
+  scrollOffsets = [...$("#scroll").children].map(f => f.offsetTop);
   render();
   show("viewer");
 }
@@ -421,6 +458,7 @@ function render(dir){
   if (dir){ img.classList.remove("turn","turn-back"); void img.offsetWidth;
             img.classList.add(dir > 0 ? "turn" : "turn-back"); }
   $("#count").textContent = String(i+1).padStart(2,"0") + " / " + String(deck.slides.length).padStart(2,"0");
+  $("#count").classList.toggle("is-end", i === deck.slides.length - 1);
   [...$("#edge").children].forEach((b, n) => b.setAttribute("aria-current", n === i));
   [...$("#grid").children].forEach((el, n) => el.setAttribute("aria-current", n === i));
   if (deck.slides[i + 1]) { const p = new Image(); p.src = deck.slides[i + 1]; }
@@ -454,7 +492,10 @@ function setMode(m){
     if (el) $("#scroll").scrollTop = el.offsetTop;
   } else if (m === "grid") {
     $("#to-top").classList.remove("on");
-    [...$("#grid").children].forEach(el => { el.style.animation = "none"; void el.offsetWidth; el.style.animation = ""; });
+    const g = $("#grid");
+    g.classList.remove("on");
+    void g.offsetWidth;
+    g.classList.add("on");
     render();
   } else {
     $("#to-top").classList.remove("on");
@@ -468,9 +509,11 @@ $("#mGrid").onclick = () => setMode("grid");
 $("#scroll").addEventListener("scroll", () => {
   if (mode !== "scroll") return;
   const mid = $("#scroll").scrollTop + $("#scroll").clientHeight / 2;
-  [...$("#scroll").children].forEach((f, n) => {
-    if (f.offsetTop <= mid && f.offsetTop + f.offsetHeight > mid && n !== i){ i = n; render(); }
-  });
+  for (let n = 0; n < scrollOffsets.length; n++) {
+    const top = scrollOffsets[n];
+    const bottom = scrollOffsets[n + 1] ?? top + 9999;
+    if (top <= mid && bottom > mid && n !== i) { i = n; render(); break; }
+  }
   $("#to-top").classList.toggle("on", i >= Math.floor(deck.slides.length * 0.4));
 }, {passive:true});
 
@@ -505,6 +548,8 @@ document.addEventListener("mousemove", e => {
     navCursor.classList.remove("on","is-prev","is-next");
   });
 });
+
+addEventListener("resize", () => { if (deck && mode === "scroll") scrollOffsets = [...$("#scroll").children].map(f => f.offsetTop); });
 
 // свайп на мобільному
 let x0 = null;

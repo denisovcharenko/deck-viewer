@@ -598,7 +598,7 @@ addEventListener("keydown", e => {
     else if ($("#choice").classList.contains("on")) show("gate");
     return;
   }
-  if ((e.key === "f" || e.key === "F") && !e.metaKey && !e.ctrlKey) { e.preventDefault(); if (canFull) toggleFull(); return; }
+  if ((e.key === "f" || e.key === "F") && !e.metaKey && !e.ctrlKey) { e.preventDefault(); if (canFull) { barHideDelay = 0; toggleFull(); } return; }
   if (!$("#viewer").classList.contains("on")) return;
   if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); go(i + 1, 1); }
   if (e.key === "ArrowLeft")  go(i - 1, -1);
@@ -635,13 +635,15 @@ function toggleFull(){
   }
 }
 if (!canFull) $("#mFull").style.display = "none";
-let barHideTimer;
+let barHideTimer, barHideDelay = 2500;
 function scheduleBarHide(){
+  const delay = barHideDelay;
+  barHideDelay = 2500;
   clearTimeout(barHideTimer);
   $("#viewer").classList.remove("bar-hidden");
   barHideTimer = setTimeout(() => {
     if (document.fullscreenElement || document.webkitFullscreenElement) $("#viewer").classList.add("bar-hidden");
-  }, 2500);
+  }, delay);
 }
 function onFullChange(){
   const on = !!(document.fullscreenElement || document.webkitFullscreenElement);

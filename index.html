@@ -144,6 +144,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 #nav-cursor.no-prev .nl{opacity:.1}
 #nav-cursor.no-next .nr{opacity:.1}
 
+/* skeleton */
+@keyframes shimmer{from{background-position:-200% center}to{background-position:200% center}}
+
 /* scroll */
 .scroll{position:absolute;inset:0;overflow-y:auto;scroll-behavior:smooth;padding:clamp(16px,4vh,44px) 0;display:block;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;scrollbar-width:none}
 .scroll::-webkit-scrollbar{display:none}
@@ -155,18 +158,25 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .grid::-webkit-scrollbar{display:none}
 .grid.on{opacity:1;visibility:visible}
 .grid-item{cursor:pointer;position:relative;border-radius:2px;overflow:hidden;border:2px solid transparent;opacity:0;transition:border-color .18s,transform .2s}
+.grid-item::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,var(--paper-deep) 20%,rgba(255,255,255,.13) 50%,var(--paper-deep) 80%);background-size:300% 100%;animation:shimmer 1.6s ease-in-out infinite;transition:opacity .35s}
+.grid-item.loaded::before{opacity:0;animation:none}
 .grid-item:hover{border-color:var(--graphite);transform:scale(1.03)}
 .grid-item[aria-current="true"]{border-color:var(--cobalt)}
 @keyframes gridTileIn{to{opacity:1}}
 .grid.on .grid-item{animation:gridTileIn .38s cubic-bezier(0.16,1,0.3,1) forwards;animation-delay:calc(var(--n,0)*8ms)}
-.grid-item img{width:100%;display:block;background:#fff;aspect-ratio:16/9;user-select:none;-webkit-user-drag:none}
-.grid-item .num{position:absolute;bottom:0;left:0;right:0;padding:3px 6px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:rgba(255,255,255,.55);background:linear-gradient(transparent,rgba(0,0,0,.55));text-align:center}
-.scroll figure{margin:0 auto clamp(14px,3vh,32px);width:min(1080px,92%)}
+.grid-item img{width:100%;display:block;background:#fff;aspect-ratio:16/9;user-select:none;-webkit-user-drag:none;opacity:0;transition:opacity .42s;position:relative;z-index:2}
+.grid-item.loaded img{opacity:1}
+.grid-item .num{position:absolute;bottom:0;left:0;right:0;padding:3px 6px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:rgba(255,255,255,.55);background:linear-gradient(transparent,rgba(0,0,0,.55));text-align:center;z-index:3}
+.scroll figure{margin:0 auto clamp(14px,3vh,32px);width:min(1080px,92%);position:relative}
+.scroll figure::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,var(--paper-deep) 20%,rgba(255,255,255,.13) 50%,var(--paper-deep) 80%);background-size:300% 100%;animation:shimmer 1.6s ease-in-out infinite;transition:opacity .35s}
+.scroll figure.loaded::before{opacity:0;animation:none}
 .scroll img{
   width:100%;display:block;background:#fff;aspect-ratio:16/9;
   box-shadow:0 0 0 1px rgba(255,255,255,.06),0 16px 36px -16px rgba(0,0,0,.50);
-  user-select:none;-webkit-user-drag:none
+  user-select:none;-webkit-user-drag:none;
+  opacity:0;transition:opacity .42s;position:relative;z-index:2
 }
+.scroll figure.loaded img{opacity:1}
 @keyframes choiceL{from{opacity:0;transform:translateX(-22px)}to{opacity:1;transform:none}}
 @keyframes choiceR{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:none}}
 #choice.on .choice:nth-child(1){animation:choiceL .52s cubic-bezier(0.16,1,0.3,1) .04s both}
@@ -373,6 +383,9 @@ function open(key){
   deck.slides.forEach((src, n) => {
     const f = document.createElement("figure");
     f.innerHTML = `<img src="${src}" alt="Slide ${n+1}" loading="${n === 0 ? 'eager' : 'lazy'}">`;
+    const img = f.querySelector("img");
+    if (img.complete && img.naturalWidth) f.classList.add("loaded");
+    else img.onload = () => f.classList.add("loaded");
     $("#scroll").append(f);
   });
 
@@ -383,6 +396,9 @@ function open(key){
     item.style.setProperty("--n", Math.min(n, 24));
     item.setAttribute("aria-label", "Slide " + (n + 1));
     item.innerHTML = `<img src="${src}" alt="Slide ${n+1}" loading="lazy"><span class="num">${n + 1}</span>`;
+    const img = item.querySelector("img");
+    if (img.complete && img.naturalWidth) item.classList.add("loaded");
+    else img.onload = () => item.classList.add("loaded");
     item.onclick = () => { go(n); setMode("page"); };
     $("#grid").append(item);
   });

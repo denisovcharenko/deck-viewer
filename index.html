@@ -148,6 +148,16 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .scroll::-webkit-scrollbar{display:none}
 .scroll.on{display:block}
 .book.off{display:none}
+
+/* grid */
+.grid{position:absolute;inset:0;overflow-y:auto;padding:clamp(12px,2.5vh,28px);display:none;scrollbar-width:none}
+.grid::-webkit-scrollbar{display:none}
+.grid.on{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:clamp(6px,1.2vw,14px);align-content:start}
+.grid-item{cursor:pointer;position:relative;border-radius:2px;overflow:hidden;border:2px solid transparent;transition:border-color .18s,opacity .18s}
+.grid-item:hover{border-color:var(--graphite)}
+.grid-item[aria-current="true"]{border-color:var(--cobalt)}
+.grid-item img{width:100%;display:block;background:#fff;aspect-ratio:16/9;user-select:none;-webkit-user-drag:none}
+.grid-item .num{position:absolute;bottom:0;left:0;right:0;padding:3px 6px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:rgba(255,255,255,.55);background:linear-gradient(transparent,rgba(0,0,0,.55));text-align:center}
 .scroll figure{margin:0 auto clamp(14px,3vh,32px);width:min(1080px,92%)}
 .scroll img{
   width:100%;display:block;background:#fff;aspect-ratio:16/9;
@@ -227,6 +237,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     <div class="modes">
       <button id="mPage" aria-pressed="true">Page</button>
       <button id="mScroll" aria-pressed="false">Scroll</button>
+      <button id="mGrid" aria-pressed="false">Grid</button>
     </div>
   </header>
   <div class="stage">
@@ -236,6 +247,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       <div class="tap next" id="tapNext" aria-hidden="true"></div>
     </div>
     <div class="scroll" id="scroll"></div>
+    <div class="grid" id="grid"></div>
     <nav class="edge" id="edge" aria-label="Slides"></nav>
     <div class="count" id="count"></div>
     <button id="to-top" aria-label="Back to top">↑</button>
@@ -259,13 +271,13 @@ const PROJECTS = {
       "slides/en/0.webp","slides/en/1.webp","slides/en/2.webp","slides/en/3.webp",
       "slides/en/4.webp","slides/en/5.webp","slides/en/6.webp","slides/en/7.webp",
       "slides/en/8.webp","slides/en/9.webp","slides/en/10.webp",
-      "slides/en/11@2x.webp","slides/en/12@2x.webp","slides/en/13@2x.webp",
-      "slides/en/14@2x.webp","slides/en/15@2x.webp","slides/en/16@2x.webp",
-      "slides/en/17@2x.webp","slides/en/18@2x.webp","slides/en/19@2x.webp",
-      "slides/en/20@2x.webp","slides/en/21@2x.webp","slides/en/22@2x.webp",
-      "slides/en/23@2x.webp","slides/en/24@2x.webp","slides/en/25@2x.webp",
-      "slides/en/26@2x.webp","slides/en/27@2x.webp","slides/en/28@2x.webp",
-      "slides/en/29@2x.webp","slides/en/30@2x.webp",
+      "slides/en/11.webp","slides/en/12.webp","slides/en/13.webp",
+      "slides/en/14.webp","slides/en/15.webp","slides/en/16.webp",
+      "slides/en/17.webp","slides/en/18.webp","slides/en/19.webp",
+      "slides/en/20.webp","slides/en/21.webp","slides/en/22.webp",
+      "slides/en/23.webp","slides/en/24.webp","slides/en/25.webp",
+      "slides/en/26.webp","slides/en/27.webp","slides/en/28.webp",
+      "slides/en/29.webp","slides/en/30.webp",
       "slides/en/31.webp","slides/en/32.webp","slides/en/33.webp","slides/en/34.webp",
       "slides/en/35.webp","slides/en/36.webp","slides/en/37.webp","slides/en/38.webp",
       "slides/en/39.webp","slides/en/40.webp","slides/en/41.webp","slides/en/42.webp"
@@ -357,6 +369,16 @@ function open(key){
     $("#scroll").append(f);
   });
 
+  $("#grid").innerHTML = "";
+  deck.slides.forEach((src, n) => {
+    const item = document.createElement("div");
+    item.className = "grid-item";
+    item.setAttribute("aria-label", "Slide " + (n + 1));
+    item.innerHTML = `<img src="${src}" alt="Slide ${n+1}" loading="lazy"><span class="num">${n + 1}</span>`;
+    item.onclick = () => { go(n); setMode("page"); };
+    $("#grid").append(item);
+  });
+
   render();
   show("viewer");
 }
@@ -369,6 +391,7 @@ function render(dir){
             img.classList.add(dir > 0 ? "turn" : "turn-back"); }
   $("#count").textContent = String(i+1).padStart(2,"0") + " / " + String(deck.slides.length).padStart(2,"0");
   [...$("#edge").children].forEach((b, n) => b.setAttribute("aria-current", n === i));
+  [...$("#grid").children].forEach((el, n) => el.setAttribute("aria-current", n === i));
   if (deck.slides[i + 1]) { const p = new Image(); p.src = deck.slides[i + 1]; }
   if (deck.slides[i - 1]) { const p = new Image(); p.src = deck.slides[i - 1]; }
   navCursor.classList.toggle("no-prev", i === 0);
@@ -389,8 +412,12 @@ function setMode(m){
   mode = m;
   $("#mPage").setAttribute("aria-pressed", m === "page");
   $("#mScroll").setAttribute("aria-pressed", m === "scroll");
-  $("#book").classList.toggle("off", m === "scroll");
+  $("#mGrid").setAttribute("aria-pressed", m === "grid");
+  $("#book").classList.toggle("off", m !== "page");
   $("#scroll").classList.toggle("on", m === "scroll");
+  $("#grid").classList.toggle("on", m === "grid");
+  $("#edge").style.display = m === "grid" ? "none" : "";
+  $("#count").style.display = m === "grid" ? "none" : "";
   if (m === "scroll") {
     const el = $("#scroll").children[i];
     if (el) $("#scroll").scrollTop = el.offsetTop;
@@ -401,6 +428,7 @@ function setMode(m){
 }
 $("#mPage").onclick = () => setMode("page");
 $("#mScroll").onclick = () => setMode("scroll");
+$("#mGrid").onclick = () => setMode("grid");
 
 $("#scroll").addEventListener("scroll", () => {
   if (mode !== "scroll") return;

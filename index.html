@@ -112,7 +112,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   display:flex;align-items:center;gap:16px;
   padding:env(safe-area-inset-top) max(18px,env(safe-area-inset-right)) 0 max(18px,env(safe-area-inset-left));
   border-bottom:1px solid var(--hair);
-  background:var(--paper);z-index:5
+  background:var(--paper);z-index:5;transition:opacity .5s
 }
 .bar .back{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--graphite)}
 .bar .back:hover{color:var(--ink)}
@@ -229,14 +229,14 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .edge{
   position:absolute;right:0;top:0;bottom:0;width:34px;z-index:4;
   display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:5px;
-  padding-right:9px
+  padding-right:9px;transition:opacity .5s
 }
 .edge button{height:2px;background:var(--hair);border-radius:1px;transition:transform .22s,background .22s;width:22px;padding:0;transform:scaleX(0.41);transform-origin:right center}
 .edge button:hover{transform:scaleX(0.77);background:var(--graphite)}
 .edge button[aria-current="true"]{transform:scaleX(1);background:var(--cobalt)}
 .count{
   position:absolute;right:34px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:4;
-  font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--graphite);transition:color .3s
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--graphite);transition:color .3s,opacity .5s
 }
 .count.is-end{color:var(--cobalt)}
 #to-top{
@@ -248,6 +248,20 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 }
 #to-top.on{opacity:1;pointer-events:auto}
 #to-top:hover{color:var(--ink);border-color:rgba(255,255,255,.3)}
+
+/* fullscreen */
+#mFull{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  padding:0 12px;height:44px;border:1px solid var(--hair);border-radius:2px;
+  color:var(--graphite);transition:color .2s,border-color .2s,opacity .5s;white-space:nowrap;flex-shrink:0
+}
+#mFull:hover{color:var(--ink);border-color:rgba(255,255,255,.3)}
+#mFull.is-full{color:var(--cobalt);border-color:rgba(196,212,222,.4)}
+#viewer.bar-hidden .bar,
+#viewer.bar-hidden .edge,
+#viewer.bar-hidden .count,
+#viewer.bar-hidden #to-top{opacity:0;pointer-events:none}
+
 @media (max-width:640px){
   .edge{display:none}
   .count{right:max(14px,env(safe-area-inset-right))}
@@ -257,6 +271,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   .book img{box-shadow:none}
   .bar{gap:10px}
   #to-top{right:max(14px,env(safe-area-inset-right))}
+  #mFull{display:none}
 }
 @media (max-width:360px){
   .bar .title{display:none}
@@ -321,6 +336,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       <button id="mScroll" aria-pressed="false">Scroll</button>
       <button id="mGrid" aria-pressed="false">Grid</button>
     </div>
+    <button id="mFull" aria-label="Enter fullscreen">FULL</button>
   </header>
   <div class="stage">
     <div class="book" id="book">
@@ -413,7 +429,10 @@ function tryPassword(){
   if (projectKey) {
     currentProject = PROJECTS[projectKey];
     updateMeta();
-    show("choice");
+    note.textContent = "VERIFIED";
+    note.classList.remove("err");
+    note.style.color = "var(--cobalt)";
+    setTimeout(() => { note.style.color = ""; show("choice"); }, 480);
   } else {
     note.textContent = "Wrong password. Try again.";
     note.classList.add("err");
@@ -435,6 +454,7 @@ $("#pw-toggle").onclick = () => {
 
 /* --- viewer --- */
 let deck = null, i = 0, mode = "page", scrollOffsets = [];
+const canFull = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
 
 document.querySelectorAll(".choice").forEach(b => b.onclick = () => {
   if (b.getAttribute("aria-disabled") === "true") return;
@@ -502,8 +522,9 @@ function render(dir){
   img.alt = "Slide " + (i + 1);
   if (dir){ img.classList.remove("turn","turn-back"); void img.offsetWidth;
             img.classList.add(dir > 0 ? "turn" : "turn-back"); }
-  $("#count").textContent = String(i+1).padStart(2,"0") + " / " + String(deck.slides.length).padStart(2,"0");
-  $("#count").classList.toggle("is-end", i === deck.slides.length - 1);
+  const isEnd = i === deck.slides.length - 1;
+  $("#count").textContent = String(i+1).padStart(2,"0") + " / " + String(deck.slides.length).padStart(2,"0") + (isEnd ? " · FIN." : "");
+  $("#count").classList.toggle("is-end", isEnd);
   [...$("#edge").children].forEach((b, n) => b.setAttribute("aria-current", n === i));
   [...$("#grid").children].forEach((el, n) => el.setAttribute("aria-current", n === i));
   if (deck.slides[i + 1]) { const p = new Image(); p.src = deck.slides[i + 1]; }
@@ -566,10 +587,12 @@ $("#to-top").onclick = () => { $("#scroll").scrollTop = 0; };
 
 addEventListener("keydown", e => {
   if (e.key === "Escape") {
+    if (document.fullscreenElement || document.webkitFullscreenElement) return;
     if ($("#viewer").classList.contains("on")) show("choice");
     else if ($("#choice").classList.contains("on")) show("gate");
     return;
   }
+  if ((e.key === "f" || e.key === "F") && !e.metaKey && !e.ctrlKey) { e.preventDefault(); if (canFull) toggleFull(); return; }
   if (!$("#viewer").classList.contains("on")) return;
   if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); go(i + 1, 1); }
   if (e.key === "ArrowLeft")  go(i - 1, -1);
@@ -595,6 +618,39 @@ document.addEventListener("mousemove", e => {
 });
 
 addEventListener("resize", () => { if (deck && mode === "scroll") scrollOffsets = [...$("#scroll").children].map(f => f.offsetTop); });
+
+// fullscreen
+function toggleFull(){
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  } else {
+    const el = document.documentElement;
+    (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el);
+  }
+}
+if (!canFull) $("#mFull").style.display = "none";
+let barHideTimer;
+function scheduleBarHide(){
+  clearTimeout(barHideTimer);
+  $("#viewer").classList.remove("bar-hidden");
+  barHideTimer = setTimeout(() => {
+    if (document.fullscreenElement || document.webkitFullscreenElement) $("#viewer").classList.add("bar-hidden");
+  }, 2500);
+}
+function onFullChange(){
+  const on = !!(document.fullscreenElement || document.webkitFullscreenElement);
+  const btn = $("#mFull");
+  btn.classList.toggle("is-full", on);
+  btn.textContent = on ? "EXIT" : "FULL";
+  btn.setAttribute("aria-label", on ? "Exit fullscreen" : "Enter fullscreen");
+  if (on) scheduleBarHide();
+  else { clearTimeout(barHideTimer); $("#viewer").classList.remove("bar-hidden"); }
+}
+$("#mFull").onclick = toggleFull;
+document.addEventListener("fullscreenchange", onFullChange);
+document.addEventListener("webkitfullscreenchange", onFullChange);
+$("#viewer").addEventListener("mousemove", () => { if (document.fullscreenElement || document.webkitFullscreenElement) scheduleBarHide(); });
+$("#viewer").addEventListener("touchstart", () => { if (document.fullscreenElement || document.webkitFullscreenElement) scheduleBarHide(); }, {passive:true});
 
 // свайп на мобільному
 let x0 = null;

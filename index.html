@@ -207,7 +207,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .grid.on .grid-item{animation:gridTileIn .38s cubic-bezier(0.16,1,0.3,1) forwards;animation-delay:calc(var(--n,0)*8ms)}
 .grid-item img{width:100%;display:block;background:#fff;aspect-ratio:16/9;user-select:none;-webkit-user-drag:none;opacity:0;transition:opacity .42s;position:relative;z-index:2}
 .grid-item.loaded img{opacity:1}
-.grid-item .num{position:absolute;bottom:0;left:0;right:0;padding:3px 6px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--overlay-text);background:linear-gradient(transparent,var(--overlay-lo));text-align:center;z-index:3}
 .scroll figure{margin:0 auto clamp(14px,3vh,32px);width:min(1080px,92%);position:relative}
 .scroll figure::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,var(--paper-deep) 20%,rgba(255,255,255,.13) 50%,var(--paper-deep) 80%);background-size:300% 100%;animation:shimmer 1.6s ease-in-out infinite;transition:opacity .35s}
 .scroll figure.loaded::before{opacity:0;animation:none}
@@ -503,7 +502,7 @@ function open(key){
     item.setAttribute("role", "button");
     item.setAttribute("tabindex", "0");
     item.setAttribute("aria-label", "Slide " + (n + 1));
-    item.innerHTML = `<img src="${src}" alt="Slide ${n+1}" loading="lazy"><span class="num">${n + 1}</span>`;
+    item.innerHTML = `<img src="${src}" alt="Slide ${n+1}" loading="lazy">`;
     const img = item.querySelector("img");
     if (img.complete && img.naturalWidth) item.classList.add("loaded");
     else { img.onload = () => item.classList.add("loaded"); img.onerror = () => item.classList.add("loaded","error"); }

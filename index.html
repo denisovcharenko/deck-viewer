@@ -257,6 +257,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 }
 #mFull:hover{color:var(--ink);border-color:rgba(255,255,255,.3)}
 #mFull.is-full{color:var(--cobalt);border-color:rgba(196,212,222,.4)}
+#viewer.is-full .bar{
+  position:absolute;top:0;left:0;right:0;z-index:6;
+  background:linear-gradient(rgba(0,0,0,.55) 0%,transparent 100%);
+  border-bottom-color:transparent;
+  height:auto;flex:none;padding-bottom:22px
+}
 #viewer.bar-hidden .bar,
 #viewer.bar-hidden .edge,
 #viewer.bar-hidden .count,
@@ -643,6 +649,7 @@ function onFullChange(){
   btn.classList.toggle("is-full", on);
   btn.textContent = on ? "EXIT" : "FULL";
   btn.setAttribute("aria-label", on ? "Exit fullscreen" : "Enter fullscreen");
+  $("#viewer").classList.toggle("is-full", on);
   if (on) scheduleBarHide();
   else { clearTimeout(barHideTimer); $("#viewer").classList.remove("bar-hidden"); }
 }

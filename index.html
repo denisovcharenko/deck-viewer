@@ -1,6 +1,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Deck Viewer</title>
+<title>TVMonaco · ESC</title>
+<meta name="description" content="TVMonaco Eurovision Song Contest pitch presentation.">
+<meta property="og:title" content="TVMonaco · Eurovision Pitch">
+<meta property="og:description" content="TVMonaco Eurovision Song Contest pitch presentation.">
+<meta property="og:type" content="website">
 
 <style>
 @font-face{font-family:"Syne-Bold";src:url("fonts/Syne-Bold.ttf")}
@@ -72,10 +76,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 /* ---------- 2. choice ---------- */
 #choice{justify-content:center}
 .choice-head{
-  position:absolute;top:0;left:0;right:0;padding:26px 28px;
+  position:absolute;top:0;left:0;right:0;padding:26px 28px;z-index:1;
   font-family:var(--mono);font-size:11px;letter-spacing:.32em;text-transform:uppercase;
   color:var(--graphite)
 }
+#choiceBack{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--graphite);margin-right:18px;transition:color .2s}
+#choiceBack:hover{color:var(--ink)}
 .choices{display:flex;flex:1;align-items:stretch}
 .choice{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -233,7 +239,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
 <!-- ===== 2. LANGUAGE ===== -->
 <section id="choice" class="screen">
-  <div class="choice-head">Choose a version</div>
+  <div class="choice-head"><button class="back" id="choiceBack">← Back</button>Choose a version</div>
   <div class="choices">
     <button class="choice" data-deck="en">
       <span class="name">English</span>
@@ -366,6 +372,7 @@ document.querySelectorAll(".choice").forEach(b => b.onclick = () => {
   open(b.dataset.deck);
 });
 $("#back").onclick = () => show("choice");
+$("#choiceBack").onclick = () => show("gate");
 
 function open(key){
   deck = currentProject[key]; i = 0;
@@ -470,10 +477,14 @@ $("#scroll").addEventListener("scroll", () => {
 $("#to-top").onclick = () => { $("#scroll").scrollTop = 0; };
 
 addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    if ($("#viewer").classList.contains("on")) show("choice");
+    else if ($("#choice").classList.contains("on")) show("gate");
+    return;
+  }
   if (!$("#viewer").classList.contains("on")) return;
   if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); go(i + 1, 1); }
   if (e.key === "ArrowLeft")  go(i - 1, -1);
-  if (e.key === "Escape") show("choice");
 });
 
 // кастомний курсор < >

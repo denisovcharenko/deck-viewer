@@ -30,7 +30,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 :focus-visible{outline:2px solid var(--cobalt);outline-offset:3px}
 
 .screen{position:fixed;inset:0;display:none;flex-direction:column}
-.screen.on{display:flex}
+.screen.on{display:flex;animation:screenIn .42s cubic-bezier(0.16,1,0.3,1) both}
+@keyframes screenIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 
 /* ---------- 1. gate ---------- */
 #gate{align-items:center;justify-content:center;padding:24px}
@@ -114,7 +115,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .stage{flex:1;position:relative;overflow:hidden}
 
 /* book */
-.book{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:clamp(16px,4vh,44px)}
+.book{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:clamp(16px,4vh,44px);opacity:1;visibility:visible;transition:opacity .22s,visibility .22s}
 .book img{
   max-width:100%;max-height:100%;object-fit:contain;
   box-shadow:0 0 0 1px rgba(255,255,255,.06),0 24px 48px -16px rgba(0,0,0,.60);
@@ -144,18 +145,20 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 #nav-cursor.no-next .nr{opacity:.1}
 
 /* scroll */
-.scroll{position:absolute;inset:0;overflow-y:auto;scroll-behavior:smooth;padding:clamp(16px,4vh,44px) 0;display:none;scrollbar-width:none}
+.scroll{position:absolute;inset:0;overflow-y:auto;scroll-behavior:smooth;padding:clamp(16px,4vh,44px) 0;display:block;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;scrollbar-width:none}
 .scroll::-webkit-scrollbar{display:none}
-.scroll.on{display:block}
-.book.off{display:none}
+.scroll.on{opacity:1;visibility:visible}
+.book.off{opacity:0;visibility:hidden;pointer-events:none}
 
 /* grid */
-.grid{position:absolute;inset:0;overflow-y:auto;padding:clamp(12px,2.5vh,28px);display:none;scrollbar-width:none}
+.grid{position:absolute;inset:0;overflow-y:auto;padding:clamp(12px,2.5vh,28px);display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:clamp(6px,1.2vw,14px);align-content:start;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;scrollbar-width:none}
 .grid::-webkit-scrollbar{display:none}
-.grid.on{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:clamp(6px,1.2vw,14px);align-content:start}
-.grid-item{cursor:pointer;position:relative;border-radius:2px;overflow:hidden;border:2px solid transparent;transition:border-color .18s,opacity .18s}
-.grid-item:hover{border-color:var(--graphite)}
+.grid.on{opacity:1;visibility:visible}
+.grid-item{cursor:pointer;position:relative;border-radius:2px;overflow:hidden;border:2px solid transparent;opacity:0;transition:border-color .18s,transform .2s}
+.grid-item:hover{border-color:var(--graphite);transform:scale(1.03)}
 .grid-item[aria-current="true"]{border-color:var(--cobalt)}
+@keyframes gridTileIn{to{opacity:1}}
+.grid.on .grid-item{animation:gridTileIn .38s cubic-bezier(0.16,1,0.3,1) forwards;animation-delay:calc(var(--n,0)*8ms)}
 .grid-item img{width:100%;display:block;background:#fff;aspect-ratio:16/9;user-select:none;-webkit-user-drag:none}
 .grid-item .num{position:absolute;bottom:0;left:0;right:0;padding:3px 6px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:rgba(255,255,255,.55);background:linear-gradient(transparent,rgba(0,0,0,.55));text-align:center}
 .scroll figure{margin:0 auto clamp(14px,3vh,32px);width:min(1080px,92%)}
@@ -164,6 +167,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   box-shadow:0 0 0 1px rgba(255,255,255,.06),0 16px 36px -16px rgba(0,0,0,.50);
   user-select:none;-webkit-user-drag:none
 }
+@keyframes choiceL{from{opacity:0;transform:translateX(-22px)}to{opacity:1;transform:none}}
+@keyframes choiceR{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:none}}
+#choice.on .choice:nth-child(1){animation:choiceL .52s cubic-bezier(0.16,1,0.3,1) .04s both}
+#choice.on .choice:nth-child(2){animation:choiceR .52s cubic-bezier(0.16,1,0.3,1) .12s both}
 .choice[aria-disabled="true"]{opacity:.4;cursor:default;pointer-events:none}
 .choice[aria-disabled="true"]:hover,.choice[aria-disabled="true"]:focus-visible{background:none}
 
@@ -173,9 +180,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:5px;
   padding-right:9px
 }
-.edge button{height:2px;background:var(--hair);border-radius:1px;transition:width .22s,background .22s;width:9px;padding:0}
-.edge button:hover{width:17px;background:var(--graphite)}
-.edge button[aria-current="true"]{width:22px;background:var(--cobalt)}
+.edge button{height:2px;background:var(--hair);border-radius:1px;transition:transform .22s,background .22s;width:22px;padding:0;transform:scaleX(0.41);transform-origin:right center}
+.edge button:hover{transform:scaleX(0.77);background:var(--graphite)}
+.edge button[aria-current="true"]{transform:scaleX(1);background:var(--cobalt)}
 .count{
   position:absolute;right:34px;bottom:16px;z-index:4;
   font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--graphite)
@@ -198,7 +205,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   .book img{box-shadow:none}
 }
 @media (prefers-reduced-motion:reduce){
-  *{animation:none!important;transition:none!important}
+  *{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:50ms!important}
   .scroll{scroll-behavior:auto}
 }
 </style>
@@ -373,6 +380,7 @@ function open(key){
   deck.slides.forEach((src, n) => {
     const item = document.createElement("div");
     item.className = "grid-item";
+    item.style.setProperty("--n", Math.min(n, 24));
     item.setAttribute("aria-label", "Slide " + (n + 1));
     item.innerHTML = `<img src="${src}" alt="Slide ${n+1}" loading="lazy"><span class="num">${n + 1}</span>`;
     item.onclick = () => { go(n); setMode("page"); };
@@ -421,6 +429,10 @@ function setMode(m){
   if (m === "scroll") {
     const el = $("#scroll").children[i];
     if (el) $("#scroll").scrollTop = el.offsetTop;
+  } else if (m === "grid") {
+    $("#to-top").classList.remove("on");
+    [...$("#grid").children].forEach(el => { el.style.animation = "none"; void el.offsetWidth; el.style.animation = ""; });
+    render();
   } else {
     $("#to-top").classList.remove("on");
     render();

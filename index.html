@@ -507,9 +507,9 @@ function open(key){
     $("#grid").append(item);
   });
 
-  scrollOffsets = [...$("#scroll").children].map(f => f.offsetTop);
   render();
   show("viewer");
+  scrollOffsets = [...$("#scroll").children].map(f => f.offsetTop);
 }
 
 function render(dir){

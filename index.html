@@ -296,6 +296,26 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   }
   @keyframes swipeHint{0%,40%{opacity:1}100%{opacity:0}}
 }
+/* keyboard hint */
+#hint{
+  position:absolute;bottom:clamp(24px,6vh,44px);left:50%;
+  transform:translateX(-50%);z-index:6;pointer-events:none;
+  display:flex;align-items:center;gap:10px;white-space:nowrap;
+  animation:hintCycle 5.5s ease-out 1s both
+}
+@keyframes hintCycle{0%{opacity:0}12%{opacity:1}72%{opacity:1}100%{opacity:0}}
+.hint-key{
+  font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  border:1px solid rgba(255,255,255,.18);border-radius:2px;
+  padding:3px 8px;color:rgba(255,255,255,.55)
+}
+.hint-label{
+  font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(255,255,255,.25)
+}
+.hint-sep{width:1px;height:8px;background:rgba(255,255,255,.12);flex-shrink:0}
+@media(hover:none){#hint{display:none}}
+
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:50ms!important}
   .scroll{scroll-behavior:auto}
@@ -354,6 +374,13 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     <nav class="edge" id="edge" aria-label="Slides"></nav>
     <div class="count" id="count"></div>
     <button id="to-top" aria-label="Back to top">↑</button>
+    <div id="hint" aria-hidden="true">
+      <span class="hint-key">← →</span><span class="hint-label">Navigate</span>
+      <span class="hint-sep"></span>
+      <span class="hint-key">F</span><span class="hint-label">Fullscreen</span>
+      <span class="hint-sep"></span>
+      <span class="hint-key">Esc</span><span class="hint-label">Back</span>
+    </div>
   </div>
 </section>
 
@@ -515,6 +542,7 @@ function open(key){
   render();
   show("viewer");
   scrollOffsets = [...$("#scroll").children].map(f => f.offsetTop);
+  showHint();
 }
 
 function render(dir){
@@ -591,6 +619,7 @@ $("#scroll").addEventListener("scroll", () => {
 $("#to-top").onclick = () => { $("#scroll").scrollTop = 0; };
 
 addEventListener("keydown", e => {
+  dismissHint();
   if (e.key === "Escape") {
     if (document.fullscreenElement || document.webkitFullscreenElement) return;
     if ($("#viewer").classList.contains("on")) show("choice");
@@ -623,6 +652,19 @@ document.addEventListener("mousemove", e => {
 });
 
 addEventListener("resize", () => { if (deck && mode === "scroll") scrollOffsets = [...$("#scroll").children].map(f => f.offsetTop); });
+
+// onboarding hint
+function showHint(){
+  const h = $("#hint");
+  if (!h) return;
+  if (localStorage.getItem("hint-seen")) { h.style.display = "none"; return; }
+  localStorage.setItem("hint-seen", "1");
+  h.addEventListener("animationend", () => h.style.display = "none", {once: true});
+}
+function dismissHint(){
+  const h = $("#hint");
+  if (h) h.style.display = "none";
+}
 
 // fullscreen
 function toggleFull(){
